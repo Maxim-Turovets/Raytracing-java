@@ -4,6 +4,7 @@ import com.project.raytracing.bmpParsing.*;
 import com.project.raytracing.geometry.RayTraceService;
 import com.project.raytracing.geometry.Trig;
 import com.project.raytracing.geometry.Vector3;
+import lombok.SneakyThrows;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -12,32 +13,38 @@ import java.io.*;
 @SpringBootApplication
 public class RaytracingApplication {
 
-
+    public static int SIZE = 500;
 
 	public static void main(String[] args) {
+		long s = System.currentTimeMillis();
 			// Point from where rays would be cast
-			Vector3 cameraPos = new Vector3(0, 0, -5);
+			Vector3 cameraPos = new Vector3(0, 0, -10);
 
 			// Look direction
-			Vector3 cameraDir = new Vector3(0, 0, 50);
+			Vector3 cameraDir = new Vector3(0, 0, 1);
 
 			// Projection plane position is at 1 unit away from camera
 			Vector3 planeOrigin = cameraPos.plus(cameraDir.norm());
 
 			// Field of view in degrees
-			float fov = 66;
+			float fov = 60;
 
 			// Screen size in pixels
-			int screenWidth = 50, screenHeight = 50;
+			int screenWidth = SIZE, screenHeight = SIZE;
 			boolean[][] screenBuffer = new boolean[screenWidth][screenHeight];
 
-			/*  b(-2,1,0) *--------* c(1,1,0)
+			/*  b(-2,1,0) *--------* c(2,1,0)
 			 *              \     /
 			 *                \  /
 			 *                  *
 			 *             a(0,0,0)
 			 */
-			Trig triangleToDraw = new Trig(new Vector3(0,0,0), new Vector3(-2, 1, 0), new Vector3(1, 1, 0));
+
+			Trig triangleToDraw = new Trig(new Vector3(0,0,0), new Vector3(-1, 1, 0), new Vector3(1, 1, 0));
+			Trig triangleToDraw2 = new Trig(new Vector3(0,0,0), new Vector3(-2, -1, 0), new Vector3(1, -1, 0));
+			Trig triangleToDraw3 = new Trig(new Vector3(0,0,0), new Vector3(3, -1, 0), new Vector3(2, 1, 0));
+			Trig triangleToDraw4 = new Trig(new Vector3(0,0,0), new Vector3(-2, 1, 0), new Vector3(-3, -1, 0));
+			Trig triangleToDraw5 = new Trig(new Vector3(0,0,0), new Vector3(-2, 3, 0), new Vector3(-3, -3, 0));
 
 			for (int x = 0; x < screenWidth; x++) {
 				for (int y = 0; y < screenHeight; y++) {
@@ -67,23 +74,61 @@ public class RaytracingApplication {
 					if (RayTraceService.thereIsIntersectionBetweenRayAndTriangle(cameraPos, rayDirection, triangleToDraw)) {
 						screenBuffer[x][y] = true;
 					}
+					if (RayTraceService.thereIsIntersectionBetweenRayAndTriangle(cameraPos, rayDirection, triangleToDraw2)) {
+						screenBuffer[x][y] = true;
+					}
+					if (RayTraceService.thereIsIntersectionBetweenRayAndTriangle(cameraPos, rayDirection, triangleToDraw3)) {
+						screenBuffer[x][y] = true;
+					}
+					if (RayTraceService.thereIsIntersectionBetweenRayAndTriangle(cameraPos, rayDirection, triangleToDraw4)) {
+						screenBuffer[x][y] = true;
+					}
+					if (RayTraceService.thereIsIntersectionBetweenRayAndTriangle(cameraPos, rayDirection, triangleToDraw5)) {
+						screenBuffer[x][y] = true;
+					}
 				}
 			}
 
 			// Output our buffer
 			DrawScreenBuffer(screenHeight, screenWidth, screenBuffer);
+
+		System.out.println(System.currentTimeMillis() - s);
 		}
 
 
 
-	private static void DrawScreenBuffer(int screenHeight, int screenWidth, boolean[][]screenBuffer ) {
-		// Y first, output by rows
-		for (int y = 0; y < screenHeight; y++) {
-			for (int x = 0; x < screenWidth; x++) {
-				System.out.print((screenBuffer[x][y] ? "X" : "."));
+	@SneakyThrows
+	private static void DrawScreenBuffer(int screenHeight, int screenWidth, boolean[][]screenBuffer )  {
+		File file = new File("Demo.bmp");
+
+		Rgb888Image image = new AbstractRgb888Image(SIZE, SIZE) {
+			public int getRgb888Pixel(int x, int y) {
+				if(screenBuffer[x][y]){
+					return 0xFF0000;
+				} else {
+					return  0xFFFFFF;
+				}
 			}
-			System.out.println();
+		};
+
+		BmpImage bmp = new BmpImage();
+		bmp.image = image;
+		FileOutputStream out = new FileOutputStream(file);
+		try {
+			BmpWriter.write(out, bmp);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			out.close();
 		}
+
+//		// Y first, output by rows
+//		for (int y = 0; y < screenHeight; y++) {
+//			for (int x = 0; x < screenWidth; x++) {
+//				System.out.print((screenBuffer[x][y] ? "X" : "."));
+//			}
+//			System.out.println();
+//		}
 	}
 
 
