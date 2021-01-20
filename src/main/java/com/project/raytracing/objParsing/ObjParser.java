@@ -18,7 +18,7 @@ import java.util.*;
 @Data
 public class ObjParser {
 
-    private final  static String FILE_PATH = "Demo.obj";
+    private final  static String FILE_PATH = "Patricio.obj";
    // private final  static String FILE_PATH = "porsche.obj";
 
     private File loadObjFile(){
@@ -26,6 +26,8 @@ public class ObjParser {
     }
 
     private Map<Integer,Vector3> points = new HashMap<>();
+    private Map<Integer,Vector3> normals = new HashMap<>();
+
     private List<Trig> trigs = new ArrayList<>();
 
     private double maxX = -9999999l;
@@ -38,7 +40,8 @@ public class ObjParser {
 
     public  void parse(){
 
-        int count = 1;
+        int countPoints = 1;
+        int countNormals = 1;
         File objFile = loadObjFile();
 
         try {
@@ -47,11 +50,20 @@ public class ObjParser {
                 String data = myReader.nextLine();
                 if(data.equalsIgnoreCase("")) continue;
                 if (data.charAt(0) == 'v' && data.charAt(1) == ' '){
-                    points.put(count,parsePoint(data));
-                    count++;
+                    points.put(countPoints,parsePoint(data));
+                    countPoints++;
+                }
+                if (data.charAt(0) == 'v' && data.charAt(1) == 'n'){
+                    normals.put(countNormals,parseNormals(data));
+                    countNormals++;
                 }
                 if (data.charAt(0) == 'f'){
-                   trigs.add(parseTriangle(data));
+                    if(data.split(" ").length > 4) {
+                        trigs.add(parseTriangle(data, false));
+                        trigs.add(parseTriangle(data,true));
+                    } else {
+                        trigs.add(parseTriangle(data, false));
+                    }
                 }
             }
             myReader.close();
@@ -83,14 +95,34 @@ public class ObjParser {
         return  new Vector3(x,y,z);
     }
 
-    private Trig parseTriangle(String string){
+    private Trig parseTriangle(String string,boolean rect){
         String[] splitsData = string.split(" ");
         String splitter = string.contains("//") ? "//" : "/";
-        Vector3 vec1 = points.get(Integer.parseInt(splitsData[1].split(splitter)[0]));
-        Vector3 vec2 = points.get(Integer.parseInt(splitsData[2].split(splitter)[0]));
-        Vector3 vec3 = points.get(Integer.parseInt(splitsData[3].split(splitter)[0]));
 
-        return  new Trig(vec1,vec2,vec3);
+        Vector3 vec1 = null;
+        Vector3 vec2 = null;
+        Vector3 vec3 = null;
+        if(!rect) {
+             vec1 = points.get(Integer.parseInt(splitsData[1].split(splitter)[0]));
+             vec2 = points.get(Integer.parseInt(splitsData[2].split(splitter)[0]));
+             vec3 = points.get(Integer.parseInt(splitsData[3].split(splitter)[0]));
+        } else {
+             vec1 = points.get(Integer.parseInt(splitsData[2].split(splitter)[0]));
+             vec2 = points.get(Integer.parseInt(splitsData[3].split(splitter)[0]));
+             vec3 = points.get(Integer.parseInt(splitsData[4].split(splitter)[0]));
+        }
+        return new Trig(vec1, vec2, vec3,rect);
     }
+
+    private Vector3 parseNormals(String string){
+        String[] splitsData = string.split(" ");
+        double x = Double.parseDouble(splitsData[1]);
+        double y = Double.parseDouble(splitsData[2]);
+        double z = Double.parseDouble(splitsData[3]);
+
+
+        return  new Vector3(x,y,z);
+    }
+
 
 }

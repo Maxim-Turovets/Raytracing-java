@@ -4,7 +4,8 @@ public class RayTraceService {
 
     final static  double EPSILON = 1e-5f;
 
-    public static boolean thereIsIntersectionBetweenRayAndTriangle(Vector3 rayOrigin, Vector3 rayVector, Trig inTriangle) {
+
+    public static double thereIsIntersectionBetweenRayAndTriangle(Vector3 rayOrigin, Vector3 rayVector, Trig inTriangle) {
         final Vector3 vertex0 = inTriangle.getA();
         final Vector3 vertex1 = inTriangle.getB();
         final Vector3 vertex2 = inTriangle.getC();
@@ -12,24 +13,35 @@ public class RayTraceService {
         final Vector3 edge2 = vertex2.minus(vertex0);
         final Vector3 h = rayVector.crossProduct(edge2);
         double a = edge1.dotProduct(h);
-        
-        if (a > EPSILON * -1 && a < EPSILON) {
-            return false;
+
+
+        if (a > -EPSILON && a < EPSILON) {
+            return 0;
         }
         double f = 1 / a;
         final Vector3 s = rayOrigin.minus(vertex0);
         double u = f * s.dotProduct(h);
         if (u < 0.0 || u > 1.0) {
-            return false;
+            return 0;
         }
         final Vector3 q = s.crossProduct(edge1);
         double v = f * rayVector.dotProduct(q);
         if (v < 0.0 || u + v > 1.0) {
-            return false;
+            return 0;
         }
 
         // At this stage we can compute t to find out where the intersection point is on the line.
         double t = f * edge2.dotProduct(q);
-        return t > EPSILON;
+
+
+        if(t > EPSILON){
+            if(inTriangle.rect){
+                return 2;
+            } else {
+                return 1;
+            }
+        } else {
+            return  0;
+        }
     }
 }
