@@ -18,8 +18,8 @@ import java.util.*;
 @Data
 public class ObjParser {
 
-    private final  static String FILE_PATH = "Patricio.obj";
-   // private final  static String FILE_PATH = "porsche.obj";
+    //private final  static String FILE_PATH = "Patricio.obj";
+    private final  static String FILE_PATH = "f-16.obj";
 
     private File loadObjFile(){
         return new File(FILE_PATH);
