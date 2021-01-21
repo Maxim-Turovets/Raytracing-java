@@ -8,6 +8,7 @@ import com.project.raytracing.geometry.RayTraceService;
 import com.project.raytracing.geometry.Trig;
 import com.project.raytracing.geometry.Vector3;
 import com.project.raytracing.objParsing.ObjParser;
+import com.project.raytracing.octree.Octree;
 import lombok.*;
 
 import java.awt.*;
@@ -16,12 +17,35 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 @Data
 @AllArgsConstructor
 public class RenderImage {
     public  int SIZE;
 
+    @SneakyThrows
+    public void renderTree(){
+        Octree a = new Octree(3d, new Vector3(0d, 0d, 0d));
+
+        final String FILE_PATH = "f-16.obj";
+        File file = new File(FILE_PATH);
+        Scanner sc = new Scanner(file);
+
+        try {
+            while (sc.hasNextLine()) {
+                double x, y, z;
+                x = Double.parseDouble(sc.next());
+                y = Double.parseDouble(sc.next());
+                z = Double.parseDouble(sc.next());
+                a.add_nodes(x, y, z);
+            }
+        }catch (Exception e){}
+        finally {
+            sc.close();
+        }
+        render();
+    }
 
     public  void render() {
         ObjParser objParser = new ObjParser();

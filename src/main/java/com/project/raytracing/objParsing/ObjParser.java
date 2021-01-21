@@ -1,17 +1,11 @@
 package com.project.raytracing.objParsing;
 
-import com.project.raytracing.bmpParsing.AbstractRgb888Image;
-import com.project.raytracing.bmpParsing.BmpImage;
-import com.project.raytracing.bmpParsing.BmpWriter;
-import com.project.raytracing.bmpParsing.Rgb888Image;
 import com.project.raytracing.geometry.Trig;
 import com.project.raytracing.geometry.Vector3;
 import lombok.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 
 @NoArgsConstructor
@@ -30,11 +24,11 @@ public class ObjParser {
 
     private List<Trig> trigs = new ArrayList<>();
 
-    private double maxX = -9999999l;
-    private double minX = 9999999l;
-    private double maxY = -9999999l;
-    private double minY = 9999999l;
-    private double minZ = 9999999l;
+    private double maxX = -9999999L;
+    private double minX = 9999999L;
+    private double maxY = -9999999L;
+    private double minY = 9999999L;
+    private double minZ = 9999999L;
 
 
 

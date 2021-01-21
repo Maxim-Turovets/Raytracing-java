@@ -1,6 +1,5 @@
 package com.project.raytracing.geometry;
 
-import com.project.raytracing.RaytracingApplication;
 import lombok.*;
 
 @ToString
@@ -12,6 +11,14 @@ public class Vector3 {
     private double y;
     private double z;
 
+    public Vector3(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.childPoints = new Vector3[8];
+    }
+
+    private Vector3[] childPoints;
 
     public Vector3 plus (Vector3 right) {
         return new Vector3(this.getX() + right.getX(), this.getY() + right.getY(),this.getZ() + right.getZ());
